@@ -41,8 +41,9 @@ template <typename T> class _Array {
     }
 
     void print() {
+      std::cout << "[ ";
       for (size_t i = 0; i != this->length; ++i) {
-        std::cout << this->data[i] << ", ";
+        std::cout << this->data[i] << (i != this->length -1 ?  ", " : " ]");
       }
       std::cout << std::endl;
     }
@@ -155,6 +156,6 @@ int main() {
   a.print();
   a.remove(a.indexOf(5).index);
   a.print();
-  std::cout << a.len();
+  std::cout << a.len() << std::endl;
   return 0;
 }
