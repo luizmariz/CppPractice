@@ -5,13 +5,16 @@ struct FoundIndex {
   bool found = false;
 };
 
-template <typename T> class Vector {
+template <typename T> class _Array {
+  private:
 
-  T* data = nullptr;
-  size_t capacity = 0;
-  size_t length = 0;
+    T* data;
+    size_t capacity;
+    size_t length;
 
   public:
+
+    _Array(): data(nullptr), capacity(0), length(0) {}
 
     size_t len() { return this->length; }
 
@@ -69,15 +72,83 @@ template <typename T> class Vector {
       return FoundIndex{index, found};
     }
 
-  ~Vector() {
-    delete[] this->data;
-  }
+    ~_Array() {
+      delete[] this->data;
+    }
+};
+
+class _String {
+  private:
+
+    unsigned int length;
+    char* data;
+
+    void str_copy( char* p_dest, char* p_src, int len) {
+      for (size_t i = 0; i < len; ++i ) {
+        p_dest[i] = std::move(p_src[i]);
+      }
+    }
+
+    int str_len(char* p) {
+      if (p == nullptr) {
+        return 0;
+      }
+
+      int _len = 0;
+
+      while (*p != '\0') {
+        ++_len;
+        ++p;
+      }
+      return _len;
+    }
+
+  public:
+
+    _String(): length(0), data(nullptr) {}
+
+    _String(char* text): length( str_len(text) ), data( new char[length] ) {
+      this->str_copy( this->data, text, this->length);
+    }
+
+    int len() { return this->length; }
+
+    _String& operator= (const _String& other_str) {
+      if ( this != &other_str ) {
+        delete[] this->data;
+        this->length = other_str.length;
+        this->data = new char[this->length];
+        this->str_copy( this->data, other_str.data, this->length);
+      }
+    }
+
+    friend std::istream& operator>> (std::istream& is, _String& s) {
+      char* buff = new char[1024];
+      is.getline(buff, 1024);
+      s = buff;
+      return is;
+    }
+
+    friend std::ostream& operator<< (std::ostream& os, _String& s) {
+      for (size_t i = 0; i != s.length; ++i) {
+        os.put(s.data[i]);
+      }
+      return os;
+    }
+
+    ~_String() {
+      delete[] this->data;
+    }
 };
 
 int main() {
-  //std::cout << "Digite um texto:";
-
-  Vector<int> a;
+  _String str = "Hello World";
+  std::cout << str << std::endl;
+  std::cout << "Digite um texto:";
+  std::cin >> str;
+  std::cout << str << std::endl;
+  std::cout << str.len() << std::endl;
+  _Array<int> a;
   a.push(5);
   a.push(4);
   a.push(3);
