@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 struct FoundIndex {
   size_t index;
@@ -97,7 +98,7 @@ class _String {
       return List<char*>{list, itemCounter};
     }
 
-    _String& operator= (const _String& otherStr) {
+    void operator= (const _String& otherStr) {
       if ( this != &otherStr ) {
         delete[] this->strData;
         this->strLength = otherStr.strLength;
@@ -217,28 +218,6 @@ class _Array {
       return FoundIndex{index, found};
     }
 
-    int strComp( char* str1, char* str2 ) {
-      size_t i = 0;
-
-      _String strA(str1);
-      _String strB(str2);
-
-      _String str(strA.len() >= strB.len() ?  str2 : str1);
-
-      while ( i < str.len() ) {
-        if ( str1[i] != str2[i] ) {
-
-          if ((int)str1[i] < (int)str2[i] ) return 1;
-          else return -1;
-
-        }
-        ++i;
-      }
-
-      if ( strA.len() > strB.len() ) return -1;
-      else return 0;
-    }
-
     void alphabeticSort() {
       bool changed;
       char* aux;
@@ -247,7 +226,7 @@ class _Array {
         changed = false;
 
         for (size_t i = 0; i < this->length-1; ++i) {
-          if ( this->strComp(this->data[i], this->data[i+1]) == -1) {
+          if ( std::strcmp(this->data[i], this->data[i+1]) == 1) {
             aux = std::move(this->data[i]);
             this->data[i] = std::move(this->data[i+1]);
             this->data[i+1] = std::move(aux);
@@ -286,7 +265,6 @@ int main() {
 
   _String str;
 
-  std::cout << "Digite o texto para filtrar: ";
   std::cin >> str;
   std::cout << std::endl;
 
@@ -296,16 +274,17 @@ int main() {
 
   for ( size_t i = 0 ; i < a.len(); ++i) {
     for (size_t j = i+1; j < a.len(); ++j) {
-      if ( a.strComp(a[i], a[j]) == 0 ) {
+      if ( b[j] != 0 && std::strcmp(a[i], a[j]) == 0 ) {
         b[i] += 1;
-        a.remove(j);
-        b.remove(j);
+        b[j] = 0;
       }
     }
   }
 
-  a.print();
-  b.print();
+  for ( size_t i = 0; i < a.len(); ++i ) {
+    if ( b[i] != 0) std::cout << a[i] << ' ' << b[i] << std::endl;
+  }
+
   return 0;
 }
 
