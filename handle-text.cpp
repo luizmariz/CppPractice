@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
 
 struct FoundIndex {
   size_t index;
@@ -20,12 +21,12 @@ class _String {
 
     void str_copy( char* pDest, char* pSrc, size_t len) {
       for (size_t i = 0; i < len; ++i ) {
-        pDest[i] = std::move(pSrc[i]);
+        pDest[i] = pSrc[i];
       }
     }
 
     int str_len(char* p) {
-      if (p == nullptr) return 0;
+      if (p == NULL) return 0;
 
       int _len = 0;
 
@@ -38,7 +39,7 @@ class _String {
 
   public:
 
-    _String(): strLength(0), strData(nullptr) {}
+    _String(): strLength(0), strData(NULL) {}
 
     _String(char* text): strLength( str_len(text) ), strData( new char[this->strLength] ) {
       this->str_copy( this->strData, text, this->strLength);
@@ -56,11 +57,11 @@ class _String {
       char* newStr = new char[newLength];
 
       for (size_t i = 0; i < this->strLength; ++i) {
-        newStr[i] = std::move(this->strData[i]);
+        newStr[i] = this->strData[i];
       }
 
       for (size_t i = this->strLength; i < newLength; ++i) {
-        newStr[i] = std::move(otherStr.strData[i - this->strLength]);
+        newStr[i] = otherStr.strData[i - this->strLength];
       }
 
       this->strLength = newLength;
@@ -95,7 +96,11 @@ class _String {
 
       }
 
-      return List<char*>{list, itemCounter};
+      List<char*> l;
+      l.content = list;
+      l.size = itemCounter;
+
+      return l;
     }
 
     void operator= (const _String& otherStr) {
@@ -145,13 +150,13 @@ class _Array {
 
     void arrayCopy( T* pDest, T* pSrc, size_t len) {
       for (size_t i = 0; i < len; ++i ) {
-        pDest[i] = std::move(pSrc[i]);
+        pDest[i] = pSrc[i];
       }
     }
 
   public:
 
-    _Array(): data(nullptr), capacity(0), length(0) {}
+    _Array(): data(NULL), capacity(0), length(0) {}
 
     _Array( int len, T element ): data( new T[sizeof(T)*len]), capacity(len), length(len) {
       for ( size_t i = 0; i < len; ++i) this->data[i] = element;
@@ -163,8 +168,8 @@ class _Array {
 
     size_t len() { return this->length; }
 
-    void push(const T &&element) {
-      if (this->data == nullptr) {
+    void push(const T element) {
+      if (this->data == NULL) {
         this->data = new T[1];
         ++this->capacity;
 
@@ -172,7 +177,7 @@ class _Array {
         T* newData = new T[sizeof(this->capacity*2)];
 
         for (size_t i = 0; i != this->capacity; ++i) {
-          newData[i] = std::move(this->data[i]);
+          newData[i] = this->data[i];
         }
 
         delete[] this->data;
@@ -199,12 +204,12 @@ class _Array {
 
     void remove(size_t index) {
       for (size_t i = index; i <= this->length; ++i) {
-        this->data[i] = std::move(this->data[i+1]);
+        this->data[i] = this->data[i+1];
       }
       --this->length;
     }
 
-    FoundIndex indexOf(const T &&element) {
+    FoundIndex indexOf(const T element) {
       size_t index = 0;
       bool found = false;
 
@@ -215,7 +220,11 @@ class _Array {
           break;
         }
       }
-      return FoundIndex{index, found};
+
+      FoundIndex f;
+      f.index = index;
+      f.found = found;
+      return f;
     }
 
     void alphabeticSort() {
@@ -227,9 +236,9 @@ class _Array {
 
         for (size_t i = 0; i < this->length-1; ++i) {
           if ( std::strcmp(this->data[i], this->data[i+1]) == 1) {
-            aux = std::move(this->data[i]);
-            this->data[i] = std::move(this->data[i+1]);
-            this->data[i+1] = std::move(aux);
+            aux = this->data[i];
+            this->data[i] = this->data[i+1];
+            this->data[i+1] = aux;
 
             changed = true;
           }
