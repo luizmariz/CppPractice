@@ -122,8 +122,13 @@ class _String {
 
     friend std::istream& operator>> (std::istream& is, _String& s) {
       char* buff = new char[1024];
-      is.getline(buff, 1024);
+      is.getline(buff, 1024, 0);
       s = buff;
+
+      for ( size_t i = 0; i < s.len(); ++i ) {
+        if ( s[i] < 32 ) s[i] = ' ';
+      }
+
       delete[] buff;
       return is;
     }
@@ -290,8 +295,10 @@ int main() {
     }
   }
 
+  a.print();
+  b.print();
   for ( size_t i = 0; i < a.len(); ++i ) {
-    if ( b[i] != 0) std::cout << a[i] << ' ' << b[i] << std::endl;
+    if ( b[i] != 0 && a[i][0] > 32) std::cout << a[i] << ' ' << b[i] << std::endl;
   }
 
   return 0;
