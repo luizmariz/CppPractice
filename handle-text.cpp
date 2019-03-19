@@ -52,24 +52,6 @@ class _String {
     int len() { return this->strLength; }
     char* value() { return this->strData; }
 
-    void concat(const _String& otherStr) {
-      size_t newLength = (this->strLength + otherStr.strLength);
-      char* newStr = new char[newLength];
-
-      for (size_t i = 0; i < this->strLength; ++i) {
-        newStr[i] = this->strData[i];
-      }
-
-      for (size_t i = this->strLength; i < newLength; ++i) {
-        newStr[i] = otherStr.strData[i - this->strLength];
-      }
-
-      this->strLength = newLength;
-      delete[] this->strData;
-      this->str_copy( this->strData, newStr, newLength);
-      delete[] newStr;
-    }
-
     List<char*> split(const char& c) {
       size_t itemCounter = 0, splitPosition = 0, listIndex = 0;
 
@@ -112,6 +94,21 @@ class _String {
       }
     }
 
+    char* operator+ (const _String& otherStr) {
+      size_t newLength = (this->strLength + otherStr.strLength);
+      char newStr[newLength+1];
+
+      for (size_t i = 0; i < this->strLength; ++i) {
+        newStr[i] = this->strData[i];
+      }
+
+      for (size_t i = this->strLength; i < newLength; ++i) {
+        newStr[i] = otherStr.strData[i - this->strLength];
+      }
+
+      return newStr;
+    }
+
     char& operator[] (int index ) {
       if( index < 0 || index > this->strLength ) {
 	      std::cerr << "Invalid index";
@@ -122,8 +119,12 @@ class _String {
 
     friend std::istream& operator>> (std::istream& is, _String& s) {
       char* buff = new char[1024];
-      is.getline(buff, 1024, 0);
-      s = buff;
+
+      while(scanf("%[^\n]%*c", buff)==1){
+        s = s + "oi ";
+      }
+      //is.getline(buff, 1024, 0);
+      //s = buff;
 
       for ( size_t i = 0; i < s.len(); ++i ) {
         if ( s[i] < 32 ) s[i] = ' ';
