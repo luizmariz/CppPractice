@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 
 struct FoundIndex {
   size_t index;
@@ -94,21 +95,6 @@ class _String {
       }
     }
 
-    char* operator+ (const _String& otherStr) {
-      size_t newLength = (this->strLength + otherStr.strLength);
-      char newStr[newLength+1];
-
-      for (size_t i = 0; i < this->strLength; ++i) {
-        newStr[i] = this->strData[i];
-      }
-
-      for (size_t i = this->strLength; i < newLength; ++i) {
-        newStr[i] = otherStr.strData[i - this->strLength];
-      }
-
-      return newStr;
-    }
-
     char& operator[] (int index ) {
       if( index < 0 || index > this->strLength ) {
 	      std::cerr << "Invalid index";
@@ -117,20 +103,32 @@ class _String {
       return this->strData[index];
     }
 
-    friend std::istream& operator>> (std::istream& is, _String& s) {
-      char* buff = new char[1024];
+    friend _String operator+( _String& s1, char* s ) {
+      _String newStr;
+      _String s2 = s;
 
-      while(scanf("%[^\n]%*c", buff)==1){
-        s = s + "oi ";
+      newStr.strLength = s1.strLength + s2.strLength;
+      newStr.strData = new char[ newStr.strLength ];
+
+      s1.str_copy( newStr.strData, s1.strData, s1.strLength );
+      s1.str_copy( newStr.strData + s1.strLength, s2.strData, s2.strLength );
+
+      return newStr;
+    }
+
+    friend std::istream& operator>> (std::istream& is, _String& s) {
+      char* data = new char[1024];
+
+      while(std::scanf("%[^\n]%*c", data)==1){
+        if ( data[0] == '\n' && data[1] == '\n' ) break;
+        s = s + data;
       }
-      //is.getline(buff, 1024, 0);
-      //s = buff;
 
       for ( size_t i = 0; i < s.len(); ++i ) {
         if ( s[i] < 32 ) s[i] = ' ';
       }
 
-      delete[] buff;
+      delete[] data;
       return is;
     }
 
@@ -241,11 +239,10 @@ class _Array {
         changed = false;
 
         for (size_t i = 0; i < this->length-1; ++i) {
-          if ( std::strcmp(this->data[i], this->data[i+1]) == 1) {
+          if ( std::strcmp(this->data[i], this->data[i+1]) > 0) {
             aux = this->data[i];
             this->data[i] = this->data[i+1];
             this->data[i+1] = aux;
-
             changed = true;
           }
         }
@@ -281,11 +278,11 @@ int main() {
   _String str;
 
   std::cin >> str;
-  std::cout << std::endl;
 
   _Array<char*> a = str.split(' ');
   _Array<int> b(a.len(), 1);
   a.alphabeticSort();
+
 
   for ( size_t i = 0 ; i < a.len(); ++i) {
     for (size_t j = i+1; j < a.len(); ++j) {
@@ -296,10 +293,8 @@ int main() {
     }
   }
 
-  a.print();
-  b.print();
   for ( size_t i = 0; i < a.len(); ++i ) {
-    if ( b[i] != 0 && a[i][0] > 32) std::cout << a[i] << ' ' << b[i] << std::endl;
+    if ( b[i] != 0 && a[i][0] > 32) std::cout << a[i] << " - " << b[i] << std::endl;
   }
 
   return 0;
