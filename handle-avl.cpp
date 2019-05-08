@@ -38,7 +38,7 @@ class _AVLTree {
 
     void printPreorder( Node *pt ) {
       if ( pt != NULL ) {
-        std::printf("%d-- e:%d d:%d\n", pt->key, pt->esq? pt->esq->key:100, pt->dir ? pt->dir->key:100);
+        std::printf("%d\n", pt->key);
         this->printPreorder( pt->esq );
         this->printPreorder( pt->dir );
       }
@@ -147,20 +147,13 @@ class _AVLTree {
 
 int main() {
   _AVLTree tree;
+  int n;
 
-  tree.push(1);
-  tree.push(0);
-  tree.push(2);
-  tree.push(2);
-  tree.push(3);
-  tree.push(2);
-  tree.push(2);
-  tree.push(5);
-  tree.push(17);
-  tree.push(2);
+  while (std::scanf("%d", &n) == 1) {
+    tree.push(n);
+  }
+
   tree.print();
-
-  std::printf("\n%d\n", tree.height());
 
   return 0;
 }
