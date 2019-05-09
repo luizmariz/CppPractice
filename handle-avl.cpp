@@ -111,7 +111,7 @@ class _AVLTree {
       }
 
       if ( bk >= 2 ) {
-        if ( this->getBalanceK(pt->esq) < 1 ) newRoot = this->rotateRight(pt);
+        if ( this->getBalanceK(pt->esq) > -1 ) newRoot = this->rotateRight(pt);
         else {
           pt->esq = this->rotateLeft(pt->esq);
           newRoot = this->rotateRight(pt);
