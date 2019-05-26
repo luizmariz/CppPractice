@@ -8,7 +8,7 @@ struct Node {
   bool color;
 };
 
-class _AVLTree {
+class _RBTree {
   private:
 
     Node* root;
@@ -24,34 +24,34 @@ class _AVLTree {
       return pt;
     }
 
-    Node* create1stNode( int key ) {
-      Node* pt = new Node;
+    Node* addNodeToTree( Node *pt, int key) {
 
-      pt->esq = NULL;
-      pt->dir = NULL;
-      pt->key = key;
-      pt->color = false;
+      if ( pt == NULL ) {
+        return this->createNode(key);
+      }
 
-      return pt;
+      if ( key < pt->key ) pt->esq = this->addNodeToTree(pt->esq, key);
+      if ( key >= pt->key ) pt->dir = this->addNodeToTree(pt->dir, key);
+
+      return this->balance(pt);
     }
 
-    void addNodeToTree( Node *pt, int key) {
+    int checkBHeight(Node *pt) {
+      if (pt == NULL)
+        return 0;
+      else {
+        int leftBlackHeight = checkBHeight(pt->esq) + (!this->isRed(pt->esq) ? 1 : 0);
+        int rightBlackHeight = checkBHeight(pt->dir) + (!this->isRed(pt->dir) ? 1 : 0);
 
-      if ( key < pt->key ) {
-        if ( pt->esq == NULL ) pt->esq = this->createNode(key);
-        else this->addNodeToTree(pt->esq, key);
+        if (leftBlackHeight != rightBlackHeight) return -1;
+        return leftBlackHeight;
       }
-
-      if ( key >= pt->key ) {
-        if ( pt->dir == NULL ) pt->dir = this->createNode(key);
-        else this->addNodeToTree(pt->dir, key);
-      }
-
     }
 
     void printPreorder( Node *pt ) {
       if ( pt != NULL ) {
-        std::printf("%d-- e:%d d:%d\n", pt->key, pt->esq? pt->esq->key:100, pt->dir ? pt->dir->key:100);
+        //std::printf("%d%c -- esq:%d, dir:%d\n", pt->key, pt->color ? 'R':'N', pt->esq == NULL ? 0 : pt->esq->key,pt->dir == NULL ? 0 : pt->dir->key);
+        std::printf("%d%c\n", pt->key, pt->color ? 'R':'N');
         this->printPreorder( pt->esq );
         this->printPreorder( pt->dir );
       }
@@ -66,17 +66,9 @@ class _AVLTree {
       }
     }
 
-    int getMaxLevel( Node *pt ) {
-      if ( pt != NULL && pt->esq == NULL && pt->dir == NULL ) {
-        return 0;
-      }
-
-      if ( pt == NULL ) {
-        return -1;
-      }
-
-      int levelEsq = 1+getMaxLevel(pt->esq), levelDir = 1+getMaxLevel(pt->dir);
-      return levelEsq >= levelDir ? levelEsq : levelDir;
+    bool isRed( Node *pt ) {
+      if (pt == NULL) return false;
+      return pt->color;
     }
 
     Node* rotateLeft( Node *pt ) {
@@ -112,60 +104,54 @@ class _AVLTree {
     }
 
     Node* balance( Node *pt ) {
-      Node* newRoot = NULL;
+      Node* newRoot = pt;
 
-      if ( pt != NULL ) {
-        pt->esq = this->balance(pt->esq);
-        pt->dir = this->balance(pt->dir);
+      if ( this->isRed(pt->dir) && !this->isRed(pt->esq) && this->isRed(pt) ) {
+        //std::printf("vou girar pra esquerda, %d\n", pt->key);
+        newRoot = this->rotateLeft(pt);
       }
 
-      if ( pt->dir->color && !pt->esq->color )  newParent = this->rotateLeft(pt);
-      if ( pt->esq->color  &&  pt->esq->esq->color ) newParent = this->rotateRight(pt);
-      if ( pt->esq->color && pt->dir->color ) this->flipColors(pt);
+      if ( this->isRed(pt->esq)  &&  this->isRed(pt->esq->esq) ) {
+        //std::printf("vou girar pra direita, %d\n", pt->key);
+        newRoot = this->rotateRight(pt);
+      }
+
+      if ( this->isRed(pt->esq) && this->isRed(pt->dir) ) {
+        //std::printf("vou trocar a cor, %d\n", pt->key);
+        this->flipColors(pt);
+      }
 
       return newRoot;
     }
 
   public:
 
-    _AVLTree(): root( NULL ) {}
+    _RBTree(): root( NULL ) {}
 
     void push(int key) {
-      if ( this->root == NULL ) this->root = create1stNode(key);
-      else this->addNodeToTree(this->root, key);
-
-      this->root = this->balance(this->root);
+      //std::printf("inseri %d\n\n", key);
+      this->root = this->addNodeToTree(this->root, key);
+      this->root->color = false;
     }
 
     void print() {
       this->printPreorder(this->root);
     }
 
-    int height() {
-      return this->getMaxLevel(this->root);
-    }
-
-    ~_AVLTree() {
+    ~_RBTree() {
       this->freeTree(this->root);
     }
 };
 
 int main() {
-  _AVLTree tree;
+  _RBTree tree;
+  int n;
 
-  tree.push(1);
-  tree.push(0);
-  tree.push(2);
-  tree.push(2);
-  tree.push(3);
-  tree.push(2);
-  tree.push(2);
-  tree.push(5);
-  tree.push(17);
-  tree.push(2);
+  while (std::scanf("%d", &n) == 1) {
+    tree.push(n);
+  }
+
   tree.print();
-
-  std::printf("\n%d\n", tree.height());
 
   return 0;
 }
