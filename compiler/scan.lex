@@ -11,9 +11,9 @@ IF [Ii][Ff]
 
 /* Comments */
 C_SIMPLE \/\/[^\n]*
-%x C_MULTI 
+%x C_MULTI
 
-STRING \"([^\\\"]|\\.|\"\")*\" 
+STRING \"([^\\\"]|\\.|\"\")*\"
 
 %%
 
