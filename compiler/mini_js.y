@@ -62,6 +62,7 @@ A: ID '=' A { checkSymbol($1.v); $$.v = $1.v + " " + $3.v + " ="; }
 LVALUEPROP: E '[' E ']' { $$.v = $1.v + " " + $3.v; }
 | E '.' ID { $$.v = $1.v + " " + $3.v; }
 | E '.' LVALUEPROP { $$.v = $1.v + " " + $3.v; }
+| E '[' E ']' LVALUEPROP { $$.v = $1.v + " " + $3.v; }
 
 E : E _EQ E
 | E '<' E { $$.v = $1.v + " " + $3.v + " <"; }

@@ -1,2 +1,2 @@
 let obj = {}, i = -2;
-obj.nome = "Manoel"
+obj.nome.casa = "Manoel";
