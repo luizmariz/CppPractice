@@ -1,0 +1,115 @@
+%{
+#include <string>
+#include <map>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+
+using namespace std;
+
+map<string, int> symbolTable = {};
+
+struct Attr {
+  string v;
+  int l = 0;
+};
+
+#define YYSTYPE Attr
+
+int yylex();
+int yyparse();
+void yyerror(const char *);
+
+void registerSymbol(const string, int);
+void checkSymbol(const string);
+%}
+
+%token NUM ID LET STR
+%start S
+
+%right '='
+%nonassoc '[' '.'
+%nonassoc '<' '>' _EQ
+%left '+' '-'
+%left '*' '/' '%'
+
+%%
+
+S: CMDs { cout << $1.v << "." << endl; }
+;
+
+CMDs: CMD ';' CMDs { $$.v = $1.v + "\n" + $3.v; }
+| { $$.v = ""; }
+;
+
+CMD : A { $$.v = $1.v + " ^"; }
+| LET DECLVARS { $$ = $2; }
+;
+
+DECLVARS: DECLVAR ',' DECLVARS { $$.v = $1.v + " " + $3.v; }
+| DECLVAR
+;
+
+DECLVAR: ID '=' E { registerSymbol($1.v, $1.l); $$.v = $1.v + "& " + $1.v + " "  + $3.v + " = ^"; }
+| ID { registerSymbol($1.v, $1.l); $$.v = $1.v + "&"; }
+;
+
+A: ID '=' A { checkSymbol($1.v); $$.v = $1.v + " " + $3.v + " ="; }
+| LVALUEPROP '=' A { $$.v = $1.v + " " + $3.v + " [=]"; }
+| E
+;
+
+LVALUEPROP: E '[' E ']' { $$.v = $1.v + " " + $3.v; }
+| E '.' ID { $$.v = $1.v + " " + $3.v; }
+| E '.' LVALUEPROP { $$.v = $1.v + " " + $3.v; }
+
+E : E _EQ E
+| E '<' E { $$.v = $1.v + " " + $3.v + " <"; }
+| E '*' E { $$.v = $1.v + " " + $3.v + " *"; }
+| E '+' E { $$.v = $1.v + " " + $3.v + " +"; }
+| E '-' E { $$.v = $1.v + " " + $3.v + " -"; }
+| E '/' E { $$.v = $1.v + " " + $3.v + " /"; }
+| E '>' E { $$.v = $1.v + " " + $3.v + " >"; }
+| E '%' E { $$.v = $1.v + " " + $3.v + " %"; }
+| F
+;
+
+F: ID { checkSymbol($1.v); $$.v = $1.v + "@"; }
+| LVALUEPROP { $$.v = $1.v + "[@]"; }
+| NUM { $$.v = $1.v; }
+| STR { $$.v = $1.v; }
+| '(' E ')'   { $$.v = $2.v; }
+| '{' '}' { $$.v = "{}"; }
+| '[' ']' { $$.v = "[]"; }
+;
+
+%%
+
+#include "lex.yy.c"
+
+void registerSymbol(const string s, int i) {
+  if (symbolTable[s] == 0) {
+    symbolTable[s] = i+1;
+  } else {
+    cout << "Erro: a variável '" + s + "' já foi declarada na linha " + to_string(symbolTable[s]) + ".\n";
+    exit( 1 );
+  }
+}
+
+void checkSymbol(const string s) {
+  if (symbolTable[s] == 0) {
+    cout << "Erro: a variável '" + s + "' não foi declarada.\n";
+    exit( 1 );
+  }
+}
+
+void yyerror( const char* st ) {
+  puts( st );
+  printf( "Proximo a: %s\n", yytext );
+  exit( 1 );
+}
+
+int main( int argc, char* argv[] ) {
+  yyparse();
+  return 0;
+}

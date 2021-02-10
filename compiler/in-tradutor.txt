@@ -1,0 +1,9 @@
+a = "hello";
+b = a + " world" + "!";
+print b;
+
+x = 3.14;
+a = max( 2, 3 * 7 + x );
+a = max( 5 );
+a = max();
+print a;

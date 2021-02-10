@@ -2,7 +2,7 @@ all: out in.txt
 	./out < in.txt
 
 clean:
-	rm out lex.yy.c
+	rm out lex.yy.c y.tab.c
 
 scan: scan.lex
 	lex scan.lex
@@ -18,3 +18,12 @@ tradutor-out: lex.yy.c
 
 stack-out: stack.cc
 	g++ -Wall -std=c++17 stack.cc -o stack
+
+mini-js-flex: mini_js.l
+	lex mini_js.l
+
+mini-js-yacc: mini_js.y
+	yacc mini_js.y
+
+mini-js-out: lex.yy.c y.tab.c
+	g++ -o out y.tab.c -ll
