@@ -2,7 +2,8 @@ WS      [ \t]
 D       [0-9]
 L	      [A-Za-z]
 ID       ({L}|\$|_)({L}|{D}|\$|_)*
-NUM     (-)?{D}*\.?{D}+([Ee][-+]?{D}+)?
+NUM     {D}*\.?{D}+([Ee][-+]?{D}+)?
+NEG_NUM (-){D}*\.?{D}+([Ee][-+]?{D}+)?
 STRING  (\"([^\\\"]|\\.|\"\")*\")|('([^\\\']|\\.|\'\')*')
 
 
@@ -12,14 +13,18 @@ STRING  (\"([^\\\"]|\\.|\"\")*\")|('([^\\\']|\\.|\'\')*')
 
 "\n"      { yylval.l++; }
 
-{NUM}     { yylval.v = yytext; return NUM; }
+{NEG_NUM} { yylval.c = blank + yytext; return NEG_NUM; }
 
-"let"	    { yylval.v = "x"; return LET; }
+{NUM}     { yylval.c = blank + yytext; return NUM; }
 
-{STRING}  { yylval.v = yytext; return STR; }
+"let"	    { yylval.c = blank + "error"; return LET; }
 
-{ID}      { yylval.v = yytext; return ID; }
+"if"	    { yylval.c = blank + "error"; return IF; }
 
-.         { yylval.v = yytext; return yytext[0]; }
+{STRING}  { yylval.c = blank + yytext; return STR; }
+
+{ID}      { yylval.c = blank + yytext; return ID; }
+
+.         { yylval.c = blank + yytext; return yytext[0]; }
 
 %%

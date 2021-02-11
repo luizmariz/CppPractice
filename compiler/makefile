@@ -1,5 +1,5 @@
 all: out in.txt
-	./out < in.txt
+	./out < in.txt > ./mdp/out.txt
 
 clean:
 	rm out lex.yy.c y.tab.c
