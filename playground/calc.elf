@@ -1,0 +1,15 @@
+00000000 <calc>:
+   0:	55                   	push   %ebp
+   1:	89 e5                	mov    %esp,%ebp
+   3:	83 7d 08 0a          	cmpl   $0xa,0x8(%ebp)
+   7:	7e 0d                	jle    16 <calc+0x16>
+   9:	8b 45 08             	mov    0x8(%ebp),%eax
+   c:	c1 e0 02             	shl    $0x2,%eax
+   f:	a3 00 00 00 00       	mov    %eax,0x0
+  14:	eb 0b                	jmp    21 <calc+0x21>
+  16:	ff 45 08             	incl   0x8(%ebp)
+  19:	8b 45 08             	mov    0x8(%ebp),%eax
+  1c:	a3 00 00 00 00       	mov    %eax,0x0
+  21:	a1 00 00 00 00       	mov    0x0,%eax
+  26:	5d                   	pop    %ebp
+  27:	c3                   	ret
