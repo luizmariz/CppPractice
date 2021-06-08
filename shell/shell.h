@@ -60,7 +60,7 @@ void print_joblist();
 void free_joblist();
 void remove_job_from_joblist(int);
 void update_job_status(int, JobStatus);
-int insert_job_in_joblist(int, JobStatus, char*);
+int insert_job_in_joblist(int, JobStatus, Command);
 int is_joblist_empty();
 int joblist_length();
 Job* get_last_job();

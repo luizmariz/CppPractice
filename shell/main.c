@@ -36,8 +36,6 @@ int main(int argc, char** argv) {
 
     cmd = read_cmd();
 
-    char* original_cmd = malloc(strlen(cmd)+1);
-    strcpy(original_cmd, cmd);
 
     if (!cmd) {
       exit(EXIT_SUCCESS);
@@ -45,13 +43,11 @@ int main(int argc, char** argv) {
 
     if (cmd[0] == '\0' || strcmp(cmd, "\n") == 0) {
       free(cmd);
-      free(original_cmd);
       continue;
     }
 
     if (strcmp(cmd, "exit\n") == 0) {
       free(cmd);
-      free(original_cmd);
       break;
     }
 
@@ -83,7 +79,7 @@ int main(int argc, char** argv) {
       }
 
       if (childPid > 0) {
-        insert_job_in_joblist(childPid, RUNING, original_cmd);
+        insert_job_in_joblist(childPid, RUNING, command);
 
         if (command.args[command.args_count - 1][0] != '&') {
           cur_fg_job = childPid;
@@ -110,7 +106,6 @@ int main(int argc, char** argv) {
     }
 
     free(cmd);
-    free(original_cmd);
     free(command.args);
     free(command.cmd);
 

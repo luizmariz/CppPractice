@@ -21,11 +21,20 @@ void print_job(int pid) {
   printf("\n[%d]  %s  pid %d  %s\n", job->id, get_status_name(job->status), job->pid, job->cmd);
 }
 
-int insert_job_in_joblist(int pid, JobStatus status, char* cmd) {
+int insert_job_in_joblist(int pid, JobStatus status, Command command) {
   int id = 1;
 
   if (last != NULL) {
     id = last->job.id + 1;
+  }
+
+  char* cmd = malloc(strlen(command.cmd)+1);
+  strcpy(cmd, command.cmd);
+
+  int i;
+  for (i = 0; i < command.args_count; i++) {
+    strcat(cmd, " ");
+    strcat(cmd, command.args[i]);
   }
 
   Job job = {
@@ -47,6 +56,7 @@ int insert_job_in_joblist(int pid, JobStatus status, char* cmd) {
   }
 
   last->next = new_node;
+  last = new_node;
 
   return id;
 }
@@ -62,7 +72,6 @@ void free_joblist() {
     JobNode* node = ptr;
     ptr = ptr->next;
     kill(node->job.pid, SIGTERM);
-    free(ptr->job.cmd);
     free(node);
   }
 
