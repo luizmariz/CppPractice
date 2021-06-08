@@ -36,17 +36,22 @@ int main(int argc, char** argv) {
 
     cmd = read_cmd();
 
+    char* original_cmd = malloc(strlen(cmd)+1);
+    strcpy(original_cmd, cmd);
+
     if (!cmd) {
       exit(EXIT_SUCCESS);
     }
 
     if (cmd[0] == '\0' || strcmp(cmd, "\n") == 0) {
       free(cmd);
+      free(original_cmd);
       continue;
     }
 
     if (strcmp(cmd, "exit\n") == 0) {
       free(cmd);
+      free(original_cmd);
       break;
     }
 
@@ -59,12 +64,16 @@ int main(int argc, char** argv) {
       switch (builtin_command) {
         case CD:
           handle_cd(command);
+          break;
         case JOBS:
           handle_jobs();
+          break;
         case FG:
           handle_job_action(command, FG);
+          break;
         case BG:
           handle_job_action(command, BG);
+          break;
       }
 		} else {
 		  childPid = fork();
@@ -74,7 +83,7 @@ int main(int argc, char** argv) {
       }
 
       if (childPid > 0) {
-        insert_job_in_joblist(childPid, RUNING, command);
+        insert_job_in_joblist(childPid, RUNING, original_cmd);
 
         if (command.args[command.args_count - 1][0] != '&') {
           cur_fg_job = childPid;
@@ -101,6 +110,7 @@ int main(int argc, char** argv) {
     }
 
     free(cmd);
+    free(original_cmd);
     free(command.args);
     free(command.cmd);
 
@@ -243,6 +253,7 @@ void execute_cmd(Command command) {
 void job_to_bg(int pid) {
   kill(pid, SIGCONT);
   update_job_status(pid, RUNING);
+  print_job(pid);
 }
 
 void job_to_fg(int pid) {
@@ -250,6 +261,7 @@ void job_to_fg(int pid) {
   update_job_status(pid, RUNING);
   cur_fg_job = pid;
   has_fg = true;
+  print_job(pid);
 }
 
 void handle_job_action(Command command, BuiltinCommand builtin_command) {
@@ -309,14 +321,15 @@ void handle_sigint() {
   if (has_fg) {
     kill(cur_fg_job, SIGINT); // Envia sigint to fg
     has_fg = false;
+    puts("");
   }
 }
 
 void handle_sigstop() {
   if (has_fg) {
-    printf("oi -> %d", cur_fg_job);
     kill(cur_fg_job, SIGSTOP); // Envia sigstop to fg
     has_fg = false;
+    puts("");
   }
 }
 
@@ -325,16 +338,19 @@ void handle_sigchld(int sig, siginfo_t* info, void* ucontext) {
   // Com a opção WNOHANG setada, se o child ainda não estiver morto
   // retorna 0. Caso contrario retorna o pid e armazena o status na variável passada
   if (waitpid(info->si_pid, &status, WNOHANG) == 0) {
-    update_job_status(info->si_pid, SUSPENDEND);
+    update_job_status(info->si_pid, SUSPENDED);
+    return;
   }
 
   // Checa se emitiu um sinal e se esse sinal foi um sinal de stop
   if (WIFSIGNALED(status) && WTERMSIG(status) == SIGSTOP) {
-    update_job_status(info->si_pid, SUSPENDEND);
+    update_job_status(info->si_pid, SUSPENDED);
+    return;
   }
 
   // Checa se o processo terminou
   if (WIFEXITED(status)) {
     update_job_status(info->si_pid, EXITED);
+    return;
   }
 }

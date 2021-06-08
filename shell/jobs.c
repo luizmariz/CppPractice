@@ -9,25 +9,29 @@ JobNode* last = NULL;
 
 void print_joblist() {
   JobNode* ptr = head;
-
   while (ptr != NULL) {
-    printf("[%d]  status %d pid %d  %s\n", ptr->job.id, ptr->job.status, ptr->job.pid, ptr->job.command.cmd);
+    printf("\n[%d]  %s  pid %d  %s", ptr->job.id, get_status_name(ptr->job.status), ptr->job.pid, ptr->job.cmd);
     ptr = ptr->next;
   }
+  printf("\n\n");
 }
 
-int insert_job_in_joblist(int pid, JobStatus status, Command command) {
+void print_job(int pid) {
+  Job* job = find_job_by_pid(pid);
+  printf("\n[%d]  %s  pid %d  %s\n", job->id, get_status_name(job->status), job->pid, job->cmd);
+}
+
+int insert_job_in_joblist(int pid, JobStatus status, char* cmd) {
   int id = 1;
 
   if (last != NULL) {
     id = last->job.id + 1;
   }
 
-
   Job job = {
     .pid = pid,
     .id = id,
-    .command = command,
+    .cmd = cmd,
     .status = status
   };
 
@@ -58,6 +62,7 @@ void free_joblist() {
     JobNode* node = ptr;
     ptr = ptr->next;
     kill(node->job.pid, SIGTERM);
+    free(ptr->job.cmd);
     free(node);
   }
 

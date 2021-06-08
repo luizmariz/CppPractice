@@ -17,14 +17,14 @@ typedef enum {
 
 typedef enum JobStatus {
   RUNING = 0,
-  SUSPENDEND,
+  SUSPENDED,
   EXITED
 } JobStatus;
 
 typedef struct {
   int pid;
   int id;
-  Command command;
+  char* cmd;
   JobStatus status;
 } Job;
 
@@ -53,17 +53,19 @@ Command parse_cmd(char*);
 
 // Utils
 char* trim_str(char*);
+char* get_status_name(JobStatus);
 
 // Jobs
 void print_joblist();
 void free_joblist();
 void remove_job_from_joblist(int);
 void update_job_status(int, JobStatus);
-int insert_job_in_joblist(int, JobStatus, Command);
+int insert_job_in_joblist(int, JobStatus, char*);
 int is_joblist_empty();
 int joblist_length();
 Job* get_last_job();
 Job* find_job_by_pid(int);
 Job* find_job_by_id(int);
+void print_job(int);
 
 #endif

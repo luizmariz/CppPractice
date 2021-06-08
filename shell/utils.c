@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include "shell.h"
 
 char* trim_str(char* str) {
   char* end;
@@ -16,5 +17,18 @@ char* trim_str(char* str) {
   end[1] = '\0';
 
   return str;
+}
+
+char* get_status_name(JobStatus status) {
+  switch (status) {
+    case RUNING:
+      return "Running";
+    case SUSPENDED:
+      return "Suspended";
+    case EXITED:
+      return "Exited";
+    default:
+      return "Unknown status";
+  }
 }
 
