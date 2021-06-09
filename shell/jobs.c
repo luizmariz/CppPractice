@@ -9,11 +9,12 @@ JobNode* last = NULL;
 
 void print_joblist() {
   JobNode* ptr = head;
+  printf("\n");
   while (ptr != NULL) {
-    printf("\n[%d]  %s  pid %d  %s", ptr->job.id, get_status_name(ptr->job.status), ptr->job.pid, ptr->job.cmd);
+    printf("[%d]  %s  pid %d  %s", ptr->job.id, get_status_name(ptr->job.status), ptr->job.pid, ptr->job.cmd);
     ptr = ptr->next;
   }
-  printf("\n\n");
+  printf("\n");
 }
 
 void print_job(int pid) {
@@ -28,14 +29,8 @@ int insert_job_in_joblist(int pid, JobStatus status, Command command) {
     id = last->job.id + 1;
   }
 
-  char* cmd = malloc(strlen(command.cmd)+1);
-  strcpy(cmd, command.cmd);
-
-  int i;
-  for (i = 0; i < command.args_count; i++) {
-    strcat(cmd, " ");
-    strcat(cmd, command.args[i]);
-  }
+  char* cmd = malloc(strlen(command.input)+1);
+  strcpy(cmd, command.input);
 
   Job job = {
     .pid = pid,

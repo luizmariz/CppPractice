@@ -2,6 +2,7 @@
 #define SHELL_H
 
 typedef struct {
+  char* input;
   char* cmd;
   char** args;
   int args_count;

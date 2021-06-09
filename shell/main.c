@@ -108,6 +108,7 @@ int main(int argc, char** argv) {
     free(cmd);
     free(command.args);
     free(command.cmd);
+    free(command.input);
 
   } while (1);
 
@@ -168,6 +169,11 @@ char* read_cmd(void) {
 
 Command parse_cmd(char* str) {
   Command command;
+
+  char* cmd_copy = malloc(strlen(str)+1);
+  strcpy(cmd_copy, str);
+
+  command.input = cmd_copy;
 
   int i, args_count = -1; // Token offset
   for (i = 0; str[i] != '\0'; i++) {

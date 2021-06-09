@@ -7,7 +7,7 @@
 
 void print_greeting() {
   printf("******************************************");
-  printf("\n\nMAB353 - LAB 4 (Custom Shell)");
+  printf("\n\nMAB353 - LAB 4 (mabshell)");
   printf("\n\nLuiz Gustavo Oliveira Mariz – DRE 118033995");
   printf("\nRodrigo Araújo – DRE 118045366");
   printf("\n\n******************************************");
